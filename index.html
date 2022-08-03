@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@500&display=swap');
+        body{
+            background: #000;
+            color: #FCFCFC;
+            margin: 0;
+            font-family: 'Edu VIC WA NT Beginner', cursive;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row d-flex align-items-center" style="height: 100vh;">
+            <div class="col-md-12 d-flex justify-content-center">
+                <form action="" method="post" id="myform" class="w-50 border rounded border-light p-4">
+                    <div id="error"></div>
+                    <input type="text" id="name" placeholder="Enter Name" class="form-control">
+                    <input type="text" id="email" placeholder="Enter Email" class="form-control mt-3">
+                    <input type="tel" id="telnum" placeholder="Enter Phone Number" class="form-control mt-3">
+                    <textarea name="" id="Message" cols="20" rows="5" placeholder="Message" class="form-control mt-3"></textarea>
+                    <input type="button" id="myBtn" class="btn btn-outline-light mt-3" onclick="savedata()" value="Save record in Indexed DB">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- <table>
+        <div id="error"> </div>
+         <form id="myform">
+           <tr>
+              <td>
+                <label for="name"> Name:</label>
+              </td>
+             <td><br>
+                <input type="text" id="name" /><br> <br>
+              </td>
+              </tr>
+                    <tr>
+                        <td><label for="email">
+                                Email:
+                            </label>
+                        </td>
+                        <td> <br><input type="email" id="email"/><br><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="telnum">
+                                Tel No.
+                            </label>
+                        </td>
+                        <td><br><input type="telnum" id="telnum" /><br> <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 
+                          <label for="Message">Message:</label>
+                        </td>
+                        <td>
+                          <textarea name="text" id="Message" rows="5" cols="20"wrap="soft">
+                         </textarea>
+                        </td>
+        
+                    </tr><br> 
+                    <tr>
+                      <td>
+                        <label for=""> </label>
+                      </td>
+                      <td>
+                          <input type="button" id="myBtn"  onclick="savedata()" value="Save record in Index DB">
+                       </td>
+                     </tr>
+                    </form>
+                  </table>
+                  <span id="alertMsg"> </span>
+                </div> -->
+    <script>
+        //indexedDB
+
+        var db;
+        
+        var  request = window.indexedDB.open("MyDatabase");
+        request.onsuccess = event => {
+        db = event.target.result;
+        };
+        request.onupgradeneeded = event => {
+        // Save the IDBDatabase interface
+        const db = event.target.result;
+        // Create an objectStore for this database
+        const objectStore = db.createObjectStore("Storename", { keyPath: "id", autoIncrement:true });
+
+
+        };
+
+        function savedata(){
+            console.log('coming in form')
+            var formvalidate = validateForm();
+            if(formvalidate) {
+            var username = document.getElementById("name").value;
+            var email = document.getElementById("email").value;
+            var telnum = document.getElementById("telnum").value;
+            var Message = document.getElementById("Message").value;
+
+
+                var dataToSend = {
+                username : username,
+                email: email,
+                telnum:telnum,
+                Message:Message,
+
+
+            }
+            const transaction = db.transaction(["Storename"], "readwrite");
+            const objectStore = transaction.objectStore("Storename");
+            
+                const request = objectStore.add(dataToSend);
+                request.onsuccess = event => {
+                //   alert("New user "+ username +" Saved Successfully..")
+                // };
+                document.getElementById("alertMsg").innerHTML =' <div class="alert alert-success alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button>'+
+                '<strong>Success!</strong> Data saved Successfully.</div>';
+                document.getElementById("error").innerHTML = '';
+                };
+
+
+            }
+        }
+            
+
+        function validateForm() {
+        var username = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var telnum = document.getElementById("telnum").value;
+        var Message = document.getElementById("Message").value;
+
+        if (username == "") { errorMessage("Name must be filled out");
+        document.getElementById("name").focus(); 
+        return false;
+        }
+
+        // if (username == "") {
+        //    document.getElementById("name").focus();
+        //   alert("Name must be filled out");
+        //   return false;
+        // }
+        else if (email == "") { errorMessage("Email must be filled out");
+        document.getElementById("email").focus();
+        return false; 
+        }
+
+
+        else if(!validateEmail(email)){errorMessage("Email format is incorrect");
+        document.getElementById("email").focus();
+        return false; 
+        }
+        //   document.getElementById("email").focus();
+        // alert("Email format is incorrect")
+        // return false;
+        // }
+        else if (telnum == ""){errorMessage("Number must be filled out");
+
+        document.getElementById("telnum").focus();
+        return false;
+
+        } else if (IsEmptyOrWhiteSpace(Message)){errorMessage("Message must be filled out");
+        document.getElementById("Message").focus();
+        
+        return false;
+        }else{
+        return true;
+        }
+
+        
+        
+
+
+        function IsEmptyOrWhiteSpace(str) {
+        return (str.match(/^\s*$/) || []).length > 0;
+        }
+
+        function validateEmail(email){
+                        return (email.match( /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                            ))}
+                        }
+
+
+        // function newFunction() {
+        //        document.getElementById("myform").reset();
+            
+        //       }
+        //                 var btn = document.getElementById("myBtn");
+            
+        //       btn.addEventListener("click",newFunction);
+            
+
+
+
+
+        function errorMessage(msg) {
+        var alerthtml = ' <div class="alert alert-danger alert-dismissible "><button type="button" class="btn-close" data-bs-dismiss="alert"></button>'+msg+'</div>';
+
+            document.getElementById("error").innerHTML = alerthtml;
+            document.getElementById("alertMsg").innerHTML = '';
+        
+        }
+        x = new XMLHttpRequest()
+        x.open("GET","")
+        x.send()
+        x.response()
+    </script>
+</body>
+</html>
