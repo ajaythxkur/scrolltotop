@@ -15,7 +15,6 @@
             color: #FCFCFC;
             margin: 0;
             padding: 0;
-            height: 5000px;
         }
         #progress{
             /* background: conic-gradient(red 10deg, yellow 0deg); */
@@ -82,9 +81,19 @@
         #accordion label + input[type="radio"]:checked + .content{
             max-height: 400px;
         }
+        #preloader{
+            background: #000 url('https://qph.fs.quoracdn.net/main-qimg-cfa55f70bbc5ce545eed804fa61a9d26') no-repeat center center;
+            background-size: 30%;
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 100;
+            margin: 0;
+        }
     </style>
 </head>
-<body>
+<body onunload="Ask()">
+    <div id="preloader"></div>
     <div id="progress">
         <span id="progress-value">
             &#x1F815
@@ -142,6 +151,17 @@
     } 
     window.onscroll = calcScrollValue;
     // window.onload = calcLoadValue;
+
+
+    //preloader 
+    var loader = document.getElementById('preloader');
+    window.addEventListener("load", function(){
+        loader.style.display = "none";
+    })
+    function Ask(){
+alert("Thanks for taking a tour to educba!");
+}
+    
 </script>
 </body>
 </html>
